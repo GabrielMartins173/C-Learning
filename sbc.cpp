@@ -5,72 +5,72 @@
 
 using namespace std;
 
-class Processo {
+class Process {
 public:
-    long long int t;
-    int c;
+    long long int timeOfRequest;
+    int numberOfCycles;
 
-    Processo(){}
+    Process(){}
 };
 
-class Comp {
+class Computing {
 public:
-    bool operator () (const Processo* p1, const Processo* p2) {
-        return (p1->c > p2->c);
+    bool operator () (const Process* p1, const Process* p2) {
+        return (p1->numberOfCycles > p2->numberOfCycles);
     }
 };
 
-bool sortAlg(Processo* p1, Processo* p2){
-    return p1->t < p2->t;
+bool sortProcesses(Process* p1, Process* p2){
+    return p1->timeOfRequest < p2->timeOfRequest;
 }
 
 int main(int argc, const char * argv[]) {
     int n, i;
-    Processo *p, *q;
-    long long int espera;
-    long long int tempoExec;
-    priority_queue<Processo*, vector<Processo*>, Comp> f;
-    vector<Processo*> processos;
+    Process *p, *q;
+    long long int wait;
+    long long int executionTime;
+    priority_queue<Process*, vector<Process*>, Computing> f;
+    vector<Process*> processes;
 
     while(cin >> n){
-        espera = 0;
-        tempoExec = 0;
-        processos.clear();
+        wait = 0;
+        executionTime = 0;
+        processes.clear();
 
         for(i = 0; i < n; i++) {
-            p = new Processo();
-            cin >> p->t >> p->c;
+            p = new Process();
+            cin >> p->timeOfRequest >> p->numberOfCycles;
 
-            if(i == 0 || p->t < tempoExec)
-                tempoExec = p->t;
+            if(i == 0 || p->timeOfRequest < executionTime)
+                executionTime = p->timeOfRequest;
 
-            processos.push_back(p);
+            processes.push_back(p);
         }
 
-        sort(processos.begin(), processos.end(), sortAlg);
+        sort(processes.begin(), processes.end(), sortProcesses);
 
-        for(Processo* p : processos){
-            if(p->t > tempoExec) {
+        for(Process* p : processes){
+            if(p->timeOfRequest > executionTime) {
                 q = f.top(); f.pop();
-                if(q->t <= tempoExec)
-                    espera += tempoExec - q->t;
+                if(q->timeOfRequest <= executionTime)
+                    wait += executionTime - q->timeOfRequest;
                 else
-                    tempoExec = q->t;
-                tempoExec += q->c;
+                    executionTime = q->timeOfRequest;
+                executionTime += q->numberOfCycles;
             }
             f.push(p);
         }
 
         while(!f.empty()) {
             q = f.top(); f.pop();
-            if(q->t <= tempoExec)
-                espera += tempoExec - q->t;
+            if(q->timeOfRequest <= executionTime)
+                wait += executionTime - q->timeOfRequest;
             else
-                tempoExec = q->t;
-            tempoExec += q->c;
+                executionTime = q->timeOfRequest;
+            executionTime += q->numberOfCycles;
         }
 
-        cout << espera << endl;
+        cout << wait << endl;
     }
 
     return 0;
